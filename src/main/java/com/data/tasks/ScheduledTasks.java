@@ -28,42 +28,12 @@ public class ScheduledTasks {
     @Value("${mq.topicName.checkIP}")
     private String checkIPTopicName;
 
-    @Value("${mq.topicName.weather}")
-    private String weatherTopicName;
-
     @Resource
     private IProxyIpService proxyIpService;
-//
-//    @Resource(name = "weatherStationManager")
-//    private WeatherStationManager weatherStationManager;
-//
     @Resource
     private CheckIpSender checkIpSender;
-//
-//    @Resource(name="weatherUpdateSender")
-//    private WeatherUpdateSender weatherUpdateSender;
-//
     @Resource
     private ICrawlService crawlService;
-
-    /**
-     * 天气定时更新任务
-     * @author zifangsky
-     * @date 2018/6/21 13:43
-     * @since 1.0.0
-     */
-//    @Scheduled(cron = "${task.updateWeather.schedule}")
-//    public void updateWeatherTask(){
-//        Date current = new Date();
-//        log.debug(MessageFormat.format("开始执行天气定时更新任务，Date：{0}",FORMAT.format(current)));
-//
-//        List<WeatherStation> list = weatherStationManager.selectAll();
-//        if(list != null && list.size() > 0){
-//            list.forEach(station -> {
-//                weatherUpdateSender.updateWeather(weatherTopicName, station.getCode());
-//            });
-//        }
-//    }
 
     /**
      * 代理IP定时检测任务（检查是否有效）
@@ -96,7 +66,7 @@ public class ScheduledTasks {
     /**
      * 西刺代理IP定时获取任务
      */
-    @Scheduled(cron = "${task.crawlProxyIp_1.schedule}")
+    @Scheduled(cron = "${task.xiciCrawlProxyIp.schedule}")
     public void crawlProxyIpTask1(){
         Date current = new Date();
         log.debug(MessageFormat.format("开始执行西刺代理IP定时获取任务，时间：{0}",FORMAT.format(current)));
@@ -107,7 +77,7 @@ public class ScheduledTasks {
     /**
      * 快代理IP定时获取任务
      */
-    @Scheduled(cron = "${task.crawlProxyIp_2.schedule}")
+    @Scheduled(cron = "${task.kuaidailiCrawlProxyIp.schedule}")
     public void crawlProxyIpTask2(){
         Date current = new Date();
         log.debug(MessageFormat.format("开始执行快代理IP定时获取任务，时间：{0}",FORMAT.format(current)));

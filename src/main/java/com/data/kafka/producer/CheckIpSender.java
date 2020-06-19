@@ -25,7 +25,7 @@ public class CheckIpSender {
 	 * @param proxyIpDTO  消息内容
 	 */
 	public void send(String topicName, ProxyIpDTO proxyIpDTO){
-        log.info(MessageFormat.format("开始向Kafka推送数据，topicName：{0}，代理IP：{1}",topicName, proxyIpDTO));
+        log.info(MessageFormat.format("开始向Kafka推送数据，topicName：{0}，代理IP：{1}:{2}",topicName, proxyIpDTO.getIp(),proxyIpDTO.getPort()));
 
         try {
             kafkaTemplate.send(topicName, proxyIpDTO);
