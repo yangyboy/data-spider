@@ -1,4 +1,4 @@
-package com.data.spider.pipeline;
+package com.data.webmagic.pipeline;
 
 import com.data.entity.ProxyIp;
 import com.data.kafka.dto.ProxyIpDTO;

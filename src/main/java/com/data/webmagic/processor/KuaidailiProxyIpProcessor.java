@@ -1,9 +1,7 @@
-package com.data.spider.processor;
+package com.data.webmagic.processor;
 
 import com.data.entity.ProxyIp;
-import com.data.spider.utils.UserAgentUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import com.data.webmagic.utils.AgentUtils;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
@@ -11,46 +9,49 @@ import us.codecraft.webmagic.selector.Html;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-/**
- * 西刺代理ip抓取
- */
-@Component
-@Slf4j
-public class XiciProxyIpProcessor implements PageProcessor {
+public class KuaidailiProxyIpProcessor implements PageProcessor {
 
 	@Override
 	public Site getSite() {
 		Site site = Site.me().setTimeOut(6000).setRetryTimes(3)
 				.setSleepTime(1000).setCharset("UTF-8").addHeader("Accept-Encoding", "/")
-				.setUserAgent(UserAgentUtils.radomAgent());
+				.setUserAgent(AgentUtils.radomAgent());
 		
 		return site;
 	}
 
 	@Override
 	public void process(Page page) {
-		List<String> ipList = page.getHtml().xpath("//table[@id='ip_list']/tbody/tr").all();
+		List<String> ipList = page.getHtml().xpath("//table[@class='table table-bordered table-striped']/tbody/tr").all();
 		List<ProxyIp> result = new ArrayList<>();
 	
 		if(ipList != null && ipList.size() > 0){
-			ipList.remove(0);  //移除表头
 			for(String tmp : ipList){
 				Html html = Html.create(tmp);
 				ProxyIp proxyIp = new ProxyIp();
 				String[] data = html.xpath("//body/text()").toString().trim().split("\\s+");
+				String dataStr = html.xpath("//body/text()").toString();
 				
 				proxyIp.setIp(data[0]);
 				proxyIp.setPort(Integer.valueOf(data[1]));
-				proxyIp.setAddr(html.xpath("//a/text()").toString());
+				
+				Pattern pattern = Pattern.compile("HTTPS?\\s(.*)?\\s\\d秒");
+				Matcher matcher = pattern.matcher(dataStr);
+				if(matcher.find()){
+					proxyIp.setAddr(matcher.group(1));
+				}
+
 				proxyIp.setType(data[3]);
 				
 				result.add(proxyIp);
 			} 
 		}
 		page.putField("result", result);
-		page.addTargetRequest("http://www.xicidaili.com/nn/2");
-		page.addTargetRequest("http://www.xicidaili.com/nt/");
+		page.addTargetRequest("https://www.kuaidaili.com/free/inha/2/");
+		page.addTargetRequest("https://www.kuaidaili.com/free/intr/1/");
 	}
 
 }

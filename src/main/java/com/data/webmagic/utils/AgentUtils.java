@@ -1,10 +1,10 @@
-package com.data.spider.utils;
+package com.data.webmagic.utils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class UserAgentUtils {
+public class AgentUtils {
 	private static List<String> list = new ArrayList<>();
 	static {
 		list.add("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.75 Safari/537.36");

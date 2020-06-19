@@ -1,4 +1,4 @@
-package com.data.spider.listener;
+package com.data.webmagic.listener;
 
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.SpiderListener;

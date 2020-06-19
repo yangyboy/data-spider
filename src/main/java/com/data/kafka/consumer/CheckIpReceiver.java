@@ -3,7 +3,7 @@ package com.data.kafka.consumer;
 import com.data.entity.ProxyIp;
 import com.data.kafka.dto.ProxyIpDTO;
 import com.data.service.IProxyIpService;
-import com.data.spider.utils.CheckIPUtils;
+import com.data.webmagic.utils.CheckIPUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -21,6 +21,7 @@ public class CheckIpReceiver {
 
 	/**
 	 * 接收消息并处理
+	 * 验证代理ip是否可用，可用ip入库，不可用ip抛弃
 	 * @param proxyIpDTO 待处理的代理IP
 	 */
 	@KafkaListener(topics = {"${mq.topicName.checkIP}"},groupId = "group2")

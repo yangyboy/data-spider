@@ -1,4 +1,4 @@
-package com.data.spider.downloader;
+package com.data.webmagic.downloader;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -6,15 +6,13 @@ import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Task;
 import us.codecraft.webmagic.downloader.HttpClientDownloader;
-import us.codecraft.webmagic.proxy.Proxy;
-import us.codecraft.webmagic.proxy.SimpleProxyProvider;
 
 /**
  * 自定义下载器，将下载失败的url记录到redis中
  */
 @Slf4j
 @Component
-public class ProxyIpDownloader extends HttpClientDownloader {
+public class MyDownloader extends HttpClientDownloader {
 
     private static final String DOWNLOAD_START_MILLS = "download_start_mills";
     private static final String DOWNLOAD_EXPAND_MILLS = "download_expand_mills";

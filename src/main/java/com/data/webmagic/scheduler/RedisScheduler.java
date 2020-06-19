@@ -1,4 +1,4 @@
-package com.data.spider.scheduler;//package com.mocc.spider.webmagic;
+package com.data.webmagic.scheduler;//package com.mocc.spider.webmagic;
 //
 //import com.alibaba.fastjson.JSON;
 //import org.apache.commons.collections.MapUtils;
