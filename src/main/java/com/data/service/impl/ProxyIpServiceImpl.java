@@ -13,16 +13,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ProxyIpServiceImpl extends ServiceImpl<ProxyIpMapper, ProxyIp> implements IProxyIpService {
 
-    private final ProxyIpMapper proxyIpMapper;
-
-    @Autowired
-    public ProxyIpServiceImpl(ProxyIpMapper proxyIpMapper) {
-        this.proxyIpMapper = proxyIpMapper;
-    }
-
-
     @Override
     public ProxyIp selectByIpAndPort(String ip, Integer port) {
-        return proxyIpMapper.selectOne(new LambdaQueryWrapper<ProxyIp>().eq(ProxyIp::getIp, ip).eq(ProxyIp::getPort,port));
+        return baseMapper.selectOne(new LambdaQueryWrapper<ProxyIp>().eq(ProxyIp::getIp, ip).eq(ProxyIp::getPort,port));
     }
 }

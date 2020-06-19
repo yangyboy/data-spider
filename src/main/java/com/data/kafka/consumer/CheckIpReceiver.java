@@ -24,7 +24,7 @@ public class CheckIpReceiver {
 	 * 验证代理ip是否可用，可用ip入库，不可用ip抛弃
 	 * @param proxyIpDTO 待处理的代理IP
 	 */
-	@KafkaListener(topics = {"${mq.topicName.checkIP}"},groupId = "group2")
+	@KafkaListener(topics = {"${mq.topicName.checkIP}"},groupId = "group-ip-spider")
 	public void handle(ProxyIpDTO proxyIpDTO) {
         log.info(MessageFormat.format("接收到消息，代理IP:{0}", proxyIpDTO));
 

@@ -2,6 +2,8 @@ package com.data.webmagic.processor;
 
 import com.data.entity.ProxyIp;
 import com.data.webmagic.utils.AgentUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
@@ -12,6 +14,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * 快代理 ip 抓取
+ */
+@Component
+@Slf4j
 public class KuaidailiProxyIpProcessor implements PageProcessor {
 
 	@Override
