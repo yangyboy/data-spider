@@ -7,17 +7,15 @@ import com.data.webmagic.utils.CheckIPUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 
 /**
  * 测试基于WebMagic框架的爬虫效果
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest
-@WebAppConfiguration
 public class TestSpider{
     @Resource
     private IProxyIpService proxyIpService;

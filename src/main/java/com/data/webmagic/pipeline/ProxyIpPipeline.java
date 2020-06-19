@@ -38,16 +38,16 @@ public class ProxyIpPipeline implements Pipeline {
 		
 		if(list != null && list.size() > 0){
 			list.forEach(proxyIp -> {
-				ProxyIpDTO proxyIpBO = new ProxyIpDTO();
-				proxyIpBO.setId(proxyIp.getId());
-				proxyIpBO.setIp(proxyIp.getIp());
-				proxyIpBO.setPort(proxyIp.getPort());
-				proxyIpBO.setType(proxyIp.getType());
-				proxyIpBO.setAddr(proxyIp.getAddr());
-				proxyIpBO.setCheckType(ProxyIpDTO.CheckIPType.ADD);
+				ProxyIpDTO proxyIpDTO = new ProxyIpDTO();
+				proxyIpDTO.setId(proxyIp.getId());
+				proxyIpDTO.setIp(proxyIp.getIp());
+				proxyIpDTO.setPort(proxyIp.getPort());
+				proxyIpDTO.setType(proxyIp.getType());
+				proxyIpDTO.setAddr(proxyIp.getAddr());
+				proxyIpDTO.setCheckType(ProxyIpDTO.CheckIPType.ADD);
 
 				//检测任务添加到队列中
-				checkIPSender.send(checkIPTopicName, proxyIpBO);
+				checkIPSender.send(checkIPTopicName, proxyIpDTO);
 			});
 		}
 
