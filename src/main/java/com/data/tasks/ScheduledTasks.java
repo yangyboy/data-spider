@@ -4,6 +4,7 @@ import com.data.entity.ProxyIp;
 import com.data.kafka.dto.ProxyIpDTO;
 import com.data.kafka.producer.CheckIpSender;
 import com.data.service.ICrawlService;
+import com.data.service.IDouyinRespFileScanService;
 import com.data.service.IProxyIpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,11 +35,13 @@ public class ScheduledTasks {
     private CheckIpSender checkIpSender;
     @Resource
     private ICrawlService crawlService;
+    @Resource
+    private IDouyinRespFileScanService douyinRespFileScanService;
 
     /**
      * 代理IP定时检测任务（检查是否有效）
      */
-    @Scheduled(cron = "${task.checkProxyIp.schedule}")
+//    @Scheduled(cron = "${task.checkProxyIp.schedule}")
     public void checkProxyIpTask(){
         Date current = new Date();
         log.debug(MessageFormat.format("开始执行代理IP定时检测任务，Date：{0}",FORMAT.format(current)));
@@ -66,7 +69,7 @@ public class ScheduledTasks {
     /**
      * 西刺代理IP定时获取任务
      */
-    @Scheduled(cron = "${task.xiciCrawlProxyIp.schedule}")
+//    @Scheduled(cron = "${task.xiciCrawlProxyIp.schedule}")
     public void crawlProxyIpTask1(){
         Date current = new Date();
         log.debug(MessageFormat.format("开始执行西刺代理IP定时获取任务，时间：{0}",FORMAT.format(current)));
@@ -77,12 +80,27 @@ public class ScheduledTasks {
     /**
      * 快代理IP定时获取任务
      */
-    @Scheduled(cron = "${task.kuaidailiCrawlProxyIp.schedule}")
+//    @Scheduled(cron = "${task.kuaidailiCrawlProxyIp.schedule}")
     public void crawlProxyIpTask2(){
         Date current = new Date();
         log.debug(MessageFormat.format("开始执行快代理IP定时获取任务，时间：{0}",FORMAT.format(current)));
 
         crawlService.kuaidailiProxyIPCrawl();
     }
+
+
+
+    /**
+     * 扫描抖音app接口返回的数据文件，将抖音app接口返回的数据文件读取进系统，发送至kafka
+     */
+//    @Scheduled(cron = "${task.kuaidailiCrawlProxyIp.schedule}")
+    public void scanDyRespFile(){
+        Date current = new Date();
+        log.debug(MessageFormat.format("开始执行抖音接口数据文件定时扫描任务，时间：{0}",FORMAT.format(current)));
+
+        int scanner = douyinRespFileScanService.scanner();
+        log.debug(MessageFormat.format("扫描到文件数量：{0}",scanner));
+    }
+
 
 }

@@ -3,12 +3,15 @@ package com.data.controller;
 import com.data.entity.ProxyIp;
 import com.data.kafka.dto.ProxyIpDTO;
 import com.data.kafka.producer.CheckIpSender;
+import com.data.service.IDouyinRespFileScanService;
 import com.data.service.IProxyIpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/kafka")
@@ -23,6 +26,9 @@ public class KafkaSendMsgTestController {
 
 
     private final IProxyIpService proxyIpService;
+
+    @Resource
+    private IDouyinRespFileScanService douyinRespFileScanService;
 
     @Autowired
     public KafkaSendMsgTestController(KafkaTemplate<Object, Object> kafkaTemplate, CheckIpSender checkIpSender, IProxyIpService proxyIpService) {
@@ -51,5 +57,11 @@ public class KafkaSendMsgTestController {
         checkIpSender.send(checkIPTopicName,proxyIpDTO);
 //        kafkaTemplate.send(checkIPTopicName,proxyIp);
         return "success";
+    }
+
+    @RequestMapping(value = "/scanner")
+    public Integer scanner(String msg){
+        int scanner = douyinRespFileScanService.scanner();
+        return scanner;
     }
 }

@@ -27,7 +27,7 @@ public class CheckIpReceiver {
 	 */
 	@KafkaListener(topics = {"${mq.topicName.checkIP}"},groupId = "group-ip-spider")
 	public void handle(ProxyIpDTO proxyIpDTO) {
-        log.info(MessageFormat.format("接收到消息，代理IP:{0}:{1}", proxyIpDTO.getIp(),proxyIpDTO.getPort()));
+        log.debug(MessageFormat.format("接收到消息，代理IP:{0}:{1}", proxyIpDTO.getIp(),proxyIpDTO.getPort()));
 
 		boolean usable = CheckIPUtils.checkValidIP(proxyIpDTO.getIp(), proxyIpDTO.getPort());
 		// 根据该IP是待入库的新IP或者数据库中的旧IP分两种情况判断

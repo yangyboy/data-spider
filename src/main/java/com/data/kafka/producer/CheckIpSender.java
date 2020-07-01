@@ -25,11 +25,11 @@ public class CheckIpSender {
 	 * @param proxyIpDTO  消息内容
 	 */
 	public void send(String topicName, ProxyIpDTO proxyIpDTO){
-        log.info(MessageFormat.format("开始向Kafka推送数据，topicName：{0}，代理IP：{1}:{2}",topicName, proxyIpDTO.getIp(),proxyIpDTO.getPort()));
+        log.debug(MessageFormat.format("开始向Kafka推送数据，topicName：{0}，代理IP：{1}:{2}",topicName, proxyIpDTO.getIp(),proxyIpDTO.getPort()));
 
         try {
             kafkaTemplate.send(topicName, proxyIpDTO);
-            log.info("推送数据成功！");
+            log.debug("推送数据成功！");
         } catch (Exception e) {
             log.error(MessageFormat.format("推送数据出错，topicName:{0},代理IP:{1}"
                     ,topicName,proxyIpDTO),e);

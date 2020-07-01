@@ -25,7 +25,7 @@ public class KuaidailiProxyIpProcessor implements PageProcessor {
 	public Site getSite() {
 		Site site = Site.me().setTimeOut(6000).setRetryTimes(3)
 				.setSleepTime(1000).setCharset("UTF-8").addHeader("Accept-Encoding", "/")
-				.setUserAgent(AgentUtils.radomAgent());
+				.setUserAgent(AgentUtils.radomWebAgent());
 		
 		return site;
 	}
