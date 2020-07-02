@@ -42,8 +42,7 @@ public class DouyinRespFileScanServiceImpl implements IDouyinRespFileScanService
                 JSONObject videoJsonObj = JSON.parseObject(jsonText);
                 douYinVideoDataSender.sender(douyinVideoTopic,videoJsonObj);
 
-//                respFile.deleteOnExit();
-
+                respFile.deleteOnExit();//扫描完成后 删除该文件
                 count++;
             } catch (Exception e) {
                 log.error("文件：{}读取失败",respFile.getAbsolutePath(),e);

@@ -2,6 +2,7 @@ package com.data.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.data.entity.DouyinUser;
 import com.data.entity.DouyinVideo;
@@ -38,6 +39,13 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
             DouyinUser user = new DouyinUser();
             JSONObject awemeObj = awemeList.getJSONObject(i);
             if (awemeObj != null) {
+
+                DouyinVideo oldVideo = this.baseMapper.selectOne(new LambdaQueryWrapper<DouyinVideo>()
+                        .eq(DouyinVideo::getAwemeId, awemeObj.getString("aweme_id")));
+                if(oldVideo != null){
+                    continue;
+                }
+
                 // 视频基本信息获取
                 video.setAwemeId(awemeObj.getString("aweme_id"));
                 video.setTitle(awemeObj.getString("desc"));
@@ -74,31 +82,32 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
                     }
                 }
 
-                /**
-                 * 保存能拿到的作者信息
-                 */
-
+                //保存能拿到的作者信息
                 JSONObject author = awemeObj.getJSONObject("author");
                 if (author != null) {
                     video.setUid(author.getString("uid"));
-                    user.setUid(author.getString("uid"));
-                    user.setShortId(author.getString("short_id"));
-                    user.setNickname(author.getString("nickname"));
-                    user.setSignature(author.getString("signature"));
-                    user.setCustomVerify(author.getString("custom_verify"));
-                    user.setSecUid(author.getString("sec_uid"));
+
+                    DouyinUser hasUser = douyinUserService.selectByUid(author.getString("uid"));
+
+                    if(hasUser == null){
+                        user.setUid(author.getString("uid"));
+                        user.setShortId(author.getString("short_id"));
+                        user.setNickname(author.getString("nickname"));
+                        user.setSignature(author.getString("signature"));
+                        user.setCustomVerify(author.getString("custom_verify"));
+                        user.setSecUid(author.getString("sec_uid"));
+
+                        douyinUserService.save(user);
+                        DouyinUserQueryDTO dto = new DouyinUserQueryDTO();
+                        dto.setSecUid(user.getSecUid());
+                        dto.setUid(user.getUid());
+                        douYinUserDataQuerySender.sender(DouyinUserQueryTopic,dto);
+                    }
+
+                    video.setCrawlTime(System.currentTimeMillis());//设置抓取时间
+                    this.save(video);
 
                 }
-
-                //TODO 发送获取用户其他信息的kafka消息
-                DouyinUserQueryDTO dto = new DouyinUserQueryDTO();
-                dto.setSecUid(user.getSecUid());
-                dto.setUid(user.getUid());
-                douYinUserDataQuerySender.sender(DouyinUserQueryTopic,dto);
-
-                douyinUserService.save(user);
-                this.save(video);
-
 
             }
 

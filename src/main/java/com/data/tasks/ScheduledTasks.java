@@ -93,13 +93,13 @@ public class ScheduledTasks {
     /**
      * 扫描抖音app接口返回的数据文件，将抖音app接口返回的数据文件读取进系统，发送至kafka
      */
-//    @Scheduled(cron = "${task.kuaidailiCrawlProxyIp.schedule}")
+    @Scheduled(cron = "${task.scaner.resp.schedule}")
     public void scanDyRespFile(){
         Date current = new Date();
-        log.debug(MessageFormat.format("开始执行抖音接口数据文件定时扫描任务，时间：{0}",FORMAT.format(current)));
+        log.info(MessageFormat.format("开始执行抖音接口数据文件定时扫描任务，时间：{0}",FORMAT.format(current)));
 
         int scanner = douyinRespFileScanService.scanner();
-        log.debug(MessageFormat.format("扫描到文件数量：{0}",scanner));
+        log.info(MessageFormat.format("扫描到文件数量：{0}",scanner));
     }
 
 

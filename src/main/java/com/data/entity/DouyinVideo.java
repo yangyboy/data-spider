@@ -10,7 +10,7 @@ import lombok.Data;
 public class DouyinVideo {
 
     @TableId
-    private Integer id;
+    private Long id;
     /**
      * 作者id
      */
@@ -85,4 +85,10 @@ public class DouyinVideo {
     private String district;
     private String address;
     private String simpleAddr;
+
+
+    /**
+     * 抓取时间
+     */
+    private long crawlTime;
 }

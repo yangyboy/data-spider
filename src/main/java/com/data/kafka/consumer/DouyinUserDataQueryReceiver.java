@@ -23,7 +23,7 @@ public class DouyinUserDataQueryReceiver {
 	@KafkaListener(topics = {"${mq.topicName.douyin.user.query}"},groupId = "group-douyin-user-query-spider")
 
 	public void handle(DouyinUserQueryDTO dto){
-		log.debug("收到消息:{}", JSON.toJSONString(dto));
+		log.info("收到消息:{}", JSON.toJSONString(dto));
 
 		douyinUserService.queryDouyinUserInfo(dto);
 	}

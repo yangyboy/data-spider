@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 public class DouyinUserServiceImpl extends ServiceImpl<DouyinUserMapper, DouyinUser> implements IDouyinUserService {
 
     @Value("${douyin.user.query}")
-    private String douyinUserQueryUrl;
+    private String baseDouyinUserQueryUrl;
 
 
     @Override
@@ -29,8 +29,9 @@ public class DouyinUserServiceImpl extends ServiceImpl<DouyinUserMapper, DouyinU
 
     @Override
     public void queryDouyinUserInfo(DouyinUserQueryDTO dto) {
-        douyinUserQueryUrl = douyinUserQueryUrl + dto.getSecUid();
+        String douyinUserQueryUrl = baseDouyinUserQueryUrl + dto.getSecUid();
         String message = JsoupUtl.getMessage(douyinUserQueryUrl);
+
         if(StrUtil.isEmpty(message) || !message.startsWith("{")){
             log.info("抖音用户：{} 查询失败，查询结果为：{}",dto.getUid(),message);
         }
@@ -39,13 +40,15 @@ public class DouyinUserServiceImpl extends ServiceImpl<DouyinUserMapper, DouyinU
 
 
         JSONObject userObj = JSON.parseObject(message);
-        douyinUser.setAwemeCount(userObj.getInteger("aweme_count"));
-        douyinUser.setFollowerCount(userObj.getInteger("follower_count"));
+        JSONObject userInfo = userObj.getJSONObject("user_info");
 
-        douyinUser.setTotalFavorited(userObj.getInteger("total_favorited"));
+        douyinUser.setAwemeCount(userInfo.getInteger("aweme_count"));
+        douyinUser.setFollowerCount(userInfo.getInteger("follower_count"));
 
-        douyinUser.setFollowingCount(userObj.getInteger("following_count"));
-        douyinUser.setFavoritingCount(userObj.getInteger("favoriting_count"));
+        douyinUser.setTotalFavorited(userInfo.getInteger("total_favorited"));
+
+        douyinUser.setFollowingCount(userInfo.getInteger("following_count"));
+        douyinUser.setFavoritingCount(userInfo.getInteger("favoriting_count"));
 
 
         this.updateById(douyinUser);
