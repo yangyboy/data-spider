@@ -1,10 +1,10 @@
 package com.data.service.impl;
 
+import cn.hutool.core.io.file.FileReader;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.data.kafka.producer.DouYinVideoDataSender;
 import com.data.service.IDouyinRespFileScanService;
-import com.data.util.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -38,11 +38,12 @@ public class DouyinRespFileScanServiceImpl implements IDouyinRespFileScanService
         for (File respFile : tempList) {
 
             try {
-                String jsonText = CommonUtils.readJsonFile(respFile.getAbsolutePath());
-                JSONObject videoJsonObj = JSON.parseObject(jsonText);
+                FileReader fileReader = new FileReader(respFile.getAbsolutePath());
+                String result = fileReader.readString();
+                JSONObject videoJsonObj = JSON.parseObject(result);
                 douYinVideoDataSender.sender(douyinVideoTopic,videoJsonObj);
 
-                respFile.deleteOnExit();//扫描完成后 删除该文件
+                respFile.delete();//扫描完成后 删除该文件
                 count++;
             } catch (Exception e) {
                 log.error("文件：{}读取失败",respFile.getAbsolutePath(),e);

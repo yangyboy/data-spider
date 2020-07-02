@@ -104,7 +104,7 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
                         douYinUserDataQuerySender.sender(DouyinUserQueryTopic,dto);
                     }
 
-                    video.setCrawlTime(System.currentTimeMillis());//设置抓取时间
+                    video.setCrawlTime(System.currentTimeMillis()/1000L);//设置抓取时间 unix 时间搓
                     this.save(video);
 
                 }
