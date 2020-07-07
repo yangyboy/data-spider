@@ -14,7 +14,7 @@ public class MyListener implements SpiderListener {
     private final AtomicInteger successCount = new AtomicInteger(0);
     private final AtomicInteger failCount = new AtomicInteger(0);
 
-    private List<Request> failRequests = new CopyOnWriteArrayList<>();
+    private final List<Request> failRequests = new CopyOnWriteArrayList<>();
 
     @Override
     public void onSuccess(Request request) {

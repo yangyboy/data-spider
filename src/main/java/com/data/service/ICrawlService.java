@@ -11,4 +11,10 @@ public interface ICrawlService {
 	 * 快代理 代理IP爬虫，地址：http://www.kuaidaili.com
 	 */
 	public void kuaidailiProxyIPCrawl();
+
+
+	/**
+	 * 抖音用户分享页面抓取
+	 */
+	public void DouyinUserSharePageCrawl();
 }

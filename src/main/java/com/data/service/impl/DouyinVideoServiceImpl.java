@@ -34,6 +34,9 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
     public void handDouyinVideoData(JSONObject videoJsonObj) {
         JSONArray awemeList = videoJsonObj.getJSONArray("aweme_list");
 
+        if(awemeList == null){
+            return ;
+        }
         for (int i = 0; i < awemeList.size(); i++) {
             DouyinVideo video = new DouyinVideo();
             DouyinUser user = new DouyinUser();
@@ -87,21 +90,24 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
                 if (author != null) {
                     video.setUid(author.getString("uid"));
 
-                    DouyinUser hasUser = douyinUserService.selectByUid(author.getString("uid"));
 
-                    if(hasUser == null){
-                        user.setUid(author.getString("uid"));
-                        user.setShortId(author.getString("short_id"));
-                        user.setNickname(author.getString("nickname"));
-                        user.setSignature(author.getString("signature"));
-                        user.setCustomVerify(author.getString("custom_verify"));
-                        user.setSecUid(author.getString("sec_uid"));
+                    synchronized (this){
+                        DouyinUser hasUser = douyinUserService.selectByUid(author.getString("uid"));
 
-                        douyinUserService.save(user);
-                        DouyinUserQueryDTO dto = new DouyinUserQueryDTO();
-                        dto.setSecUid(user.getSecUid());
-                        dto.setUid(user.getUid());
-                        douYinUserDataQuerySender.sender(DouyinUserQueryTopic,dto);
+                        if(hasUser == null){
+                            user.setUid(author.getString("uid"));
+                            user.setShortId(author.getString("short_id"));
+                            user.setNickname(author.getString("nickname"));
+                            user.setSignature(author.getString("signature"));
+                            user.setCustomVerify(author.getString("custom_verify"));
+                            user.setSecUid(author.getString("sec_uid"));
+
+                            douyinUserService.save(user);
+                            DouyinUserQueryDTO dto = new DouyinUserQueryDTO();
+                            dto.setSecUid(user.getSecUid());
+                            dto.setUid(user.getUid());
+                            douYinUserDataQuerySender.sender(DouyinUserQueryTopic,dto);
+                        }
                     }
 
                     video.setCrawlTime(System.currentTimeMillis()/1000L);//设置抓取时间 unix 时间搓

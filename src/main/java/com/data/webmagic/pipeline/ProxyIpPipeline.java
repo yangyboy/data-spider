@@ -12,11 +12,7 @@ import us.codecraft.webmagic.pipeline.Pipeline;
 
 import java.util.List;
 
-/**
- * 自定义Pipeline处理抓取的数据
- * @author zifangsky
- *
- */
+
 @Component
 public class ProxyIpPipeline implements Pipeline {
 

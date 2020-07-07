@@ -28,6 +28,8 @@ public class MyDownloader extends HttpClientDownloader {
 
     @Override
     public Page download(Request request, Task task) {
+//        super.setProxyProvider();
+
         request.putExtra(DOWNLOAD_START_MILLS, System.currentTimeMillis());
         return super.download(request, task);
     }

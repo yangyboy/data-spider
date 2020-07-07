@@ -51,4 +51,10 @@ public class TestSpider{
         crawlService.kuaidailiProxyIPCrawl();
     }
 
+
+    @Test
+    public void douyinCrawl(){
+        crawlService.DouyinUserSharePageCrawl();
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.data.config;
+package com.data.kafka.conf;
 
 
 import org.apache.kafka.common.serialization.Serializer;
