@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.data.kafka.dto.DouyinUserQueryDTO;
 import com.data.service.IDouyinUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -19,7 +20,7 @@ public class DouyinUserDataQueryReceiver {
 	 * 接收消息并处理
 	 * @param dto
 	 */
-//	@KafkaListener(topics = {"${mq.topicName.douyin.user.query}"},groupId = "group-douyin-user-query-spider")
+	@KafkaListener(topics = {"${mq.topicName.douyin.user.query}"},groupId = "group-douyin-user-query-spider")
 	public void handle(DouyinUserQueryDTO dto){
 		log.info("收到消息:{}", JSON.toJSONString(dto));
 
