@@ -17,8 +17,16 @@ public class ServiceTest {
     @Resource
     private IDouyinUserService douyinUserService;
 
+    @Resource
+    private IDouyinHotwordService douyinHotwordService;
+
     @Test
     public void testQueryDouyin() {
         douyinUserService.queryDouyinUserInfo(new DouyinUserQueryDTO());
+    }
+
+    @Test
+    public void testHotSearch() {
+        douyinHotwordService.hotSearch();
     }
 }
