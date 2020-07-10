@@ -6,14 +6,18 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.data.entity.DouyinHotWordVideo;
 import com.data.entity.DouyinHotword;
 import com.data.mapper.DouyinHotwordMapper;
+import com.data.service.IDouyinHotWordVideoService;
 import com.data.service.IDouyinHotwordService;
 import com.data.util.JsoupUtl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+import javax.xml.ws.RespectBinding;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.util.Date;
@@ -29,7 +33,9 @@ public class DouyinHotwordServiceImpl extends ServiceImpl<DouyinHotwordMapper, D
     @Value("${douyin.hot.search.video}")
     private String douyinHotSearchVideoUrl;
 
-//    MessageFormat.format("接收到消息，代理IP:{0}:{1}", proxyIpDTO.getIp(),proxyIpDTO.getPort())
+    @Resource
+    private IDouyinHotWordVideoService douyinHotWordVideoService;
+
 
     @Override
     public void hotSearch() {
@@ -51,7 +57,7 @@ public class DouyinHotwordServiceImpl extends ServiceImpl<DouyinHotwordMapper, D
 
             List<DouyinHotword> list = this.list(new LambdaQueryWrapper<DouyinHotword>().eq(DouyinHotword::getActiveTime, activeTime));
 
-            if (list != null && list.size() >0) {
+            if (list != null && list.size() > 0) {
                 return;
             }
 
@@ -77,13 +83,81 @@ public class DouyinHotwordServiceImpl extends ServiceImpl<DouyinHotwordMapper, D
 
                 this.save(douyinHotword);
 
+                /**
+                 * 根据热词搜索热词相关视频信息
+                 */
+
+
+                String formatUrl = MessageFormat.format(douyinHotSearchVideoUrl, douyinHotword.getWord());
+
+                String hotSearchVideoResp = JsoupUtl.getMessage(formatUrl);
+
+                if (!StrUtil.isEmpty(message) || message.startsWith("{")) {
+                    JSONObject hotSearchVideoJson = JSON.parseObject(hotSearchVideoResp);
+                    JSONArray videoArr = hotSearchVideoJson.getJSONArray("data");
+
+                    for (int j = 0; j < videoArr.size(); j++) {
+                        JSONObject videoObj = videoArr.getJSONObject(j);
+                        DouyinHotWordVideo video = new DouyinHotWordVideo();
+                        String aweme_id = videoObj.getString("aweme_id");
+                        video.setAwemeId(aweme_id);
+                        String desc = videoObj.getString("desc");
+
+                        video.setTitle(desc);
+
+                        Long create_time = videoObj.getLong("create_time");
+                        video.setCreateTime(create_time);
+
+                        String share_url = videoObj.getString("share_url");
+                        video.setShareUrl(share_url);
+
+                        video.setHotwordId(douyinHotword.getId());
+
+                        /**
+                         * 获得视频作者信息
+                         */
+                        JSONObject author = videoObj.getJSONObject("author");
+
+                        String uid = author.getString("uid");
+
+                        video.setUid(uid);
+
+                        String sec_uid = author.getString("sec_uid");
+
+                        video.setSecUid(sec_uid);
+
+
+                        /**
+                         * 获得视频统计信息
+                         */
+
+                        JSONObject statistics = videoObj.getJSONObject("statistics");
+
+                        Integer comment_count = statistics.getInteger("comment_count");
+                        video.setCommentCount(comment_count);
+
+                        Integer digg_count = statistics.getInteger("digg_count");
+
+                        video.setDiggCount(digg_count);
+
+                        Integer download_count = statistics.getInteger("download_count");
+
+                        video.setDownloadCount(download_count);
+
+                        Integer forward_count = statistics.getInteger("forward_count");
+                        video.setForwardCount(forward_count);
+
+
+                        Integer share_count = statistics.getInteger("share_count");
+
+                        video.setShareCount(share_count);
+
+                        video.setCrawlTime(System.currentTimeMillis() / 1000L);
+
+                        douyinHotWordVideoService.save(video);
+                    }
+                }
             }
         }
-    }
-
-
-    public static void main(String[] args) {
-
-        System.out.println(URLDecoder.decode("%E8%A1%97%E5%A4%B4%E9%9B%B6%E9%A3%9F"));
     }
 }

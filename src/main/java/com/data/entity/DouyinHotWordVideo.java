@@ -21,7 +21,7 @@ public class DouyinHotWordVideo {
     /**
      * 关联的热点词id
      */
-    private String hotwordId;
+    private Long hotwordId;
 
     /**
      * 标题

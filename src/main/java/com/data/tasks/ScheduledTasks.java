@@ -4,6 +4,7 @@ import com.data.entity.ProxyIp;
 import com.data.kafka.dto.ProxyIpDTO;
 import com.data.kafka.producer.CheckIpSender;
 import com.data.service.ICrawlService;
+import com.data.service.IDouyinHotwordService;
 import com.data.service.IDouyinRespFileScanService;
 import com.data.service.IProxyIpService;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,9 @@ public class ScheduledTasks {
     private ICrawlService crawlService;
     @Resource
     private IDouyinRespFileScanService douyinRespFileScanService;
+
+    @Resource
+    private IDouyinHotwordService douyinHotwordService;
 
     /**
      * 代理IP定时检测任务（检查是否有效）
@@ -102,5 +106,16 @@ public class ScheduledTasks {
         log.info(MessageFormat.format("扫描到文件数量：{0}",scanner));
     }
 
+
+    /**
+     * 扫描抖音热榜词，并入库
+     */
+    @Scheduled(cron = "${task.hot.word.schedule}")
+    public void hotword(){
+        Date current = new Date();
+        log.info(MessageFormat.format("开始执行抖音热榜查询任务，时间：{0}",FORMAT.format(current)));
+
+        douyinHotwordService.hotSearch();
+    }
 
 }
