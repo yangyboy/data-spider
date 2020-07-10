@@ -13,12 +13,17 @@ import com.data.service.IDouyinHotWordVideoService;
 import com.data.service.IDouyinHotwordService;
 import com.data.util.JsoupUtl;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.CharSet;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.xml.ws.RespectBinding;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Date;
 import java.util.List;
@@ -88,13 +93,19 @@ public class DouyinHotwordServiceImpl extends ServiceImpl<DouyinHotwordMapper, D
                  */
 
 
-                String formatUrl = MessageFormat.format(douyinHotSearchVideoUrl, douyinHotword.getWord());
+                String formatUrl = null;
+                try {
+                    formatUrl = MessageFormat.format(douyinHotSearchVideoUrl, URLEncoder.encode(douyinHotword.getWord(), StandardCharsets.UTF_8.name()));
+                } catch (UnsupportedEncodingException e) {
+                    log.info("url:{}编码异常",douyinHotSearchVideoUrl);
+                    continue;
+                }
 
                 String hotSearchVideoResp = JsoupUtl.getMessage(formatUrl);
 
                 if (!StrUtil.isEmpty(message) || message.startsWith("{")) {
                     JSONObject hotSearchVideoJson = JSON.parseObject(hotSearchVideoResp);
-                    JSONArray videoArr = hotSearchVideoJson.getJSONArray("data");
+                    JSONArray videoArr = hotSearchVideoJson.getJSONArray("aweme_list");
 
                     for (int j = 0; j < videoArr.size(); j++) {
                         JSONObject videoObj = videoArr.getJSONObject(j);
