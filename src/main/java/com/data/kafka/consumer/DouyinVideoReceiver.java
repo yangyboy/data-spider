@@ -19,7 +19,7 @@ public class DouyinVideoReceiver {
 	 * 接收消息并处理
 	 * @param videoJsonObj
 	 */
-//	@KafkaListener(topics = {"${mq.topicName.douyin.video}"},groupId = "group-douyin-video-spider")
+	@KafkaListener(topics = {"${mq.topicName.douyin.video}"},groupId = "group-douyin-video-spider")
 	public void handle(JSONObject videoJsonObj){
 		douyinVideoService.handDouyinVideoData(videoJsonObj);
 	}

@@ -93,7 +93,7 @@ public class DouyinHotwordServiceImpl extends ServiceImpl<DouyinHotwordMapper, D
                  */
 
 
-                String formatUrl = null;
+                String formatUrl;
                 try {
                     formatUrl = MessageFormat.format(douyinHotSearchVideoUrl, URLEncoder.encode(douyinHotword.getWord(), StandardCharsets.UTF_8.name()));
                 } catch (UnsupportedEncodingException e) {
