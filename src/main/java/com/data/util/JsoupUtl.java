@@ -11,14 +11,14 @@ import java.io.IOException;
 public class JsoupUtl {
 
     public static String getMessage(String url ){
-        log.info("抖音用户查询URL：{}",url);
+        log.info("抖音接口URL：{}",url);
         Connection.Response execute;
         String body = null ;
         try {
             execute = Jsoup.connect(url).header("User-Agent", AgentUtils.radomWebAgent())
                     .ignoreContentType(true).timeout(15000).execute();
             body = execute.body();
-            log.info("抖音用户查询结果：{}",body);
+            log.info("抖音接口结果：{}",body);
         } catch (IOException e) {
             log.error("jsoup爬取接口：{}失败",url,e);
         }
