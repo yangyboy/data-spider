@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.data.entity.DouyinChallenge;
 import com.data.entity.DouyinUser;
 import com.data.entity.DouyinVideo;
 import com.data.kafka.dto.DouyinUserQueryDTO;
@@ -27,6 +28,9 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
     @Resource
     private DouYinUserDataQuerySender douYinUserDataQuerySender;
 
+    @Resource
+    private IDouyinChallengeService douyinChallengeService;
+
     @Value("${mq.topicName.douyin.user.query}")
     private String DouyinUserQueryTopic;
 
@@ -34,8 +38,8 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
     public void handDouyinVideoData(JSONObject videoJsonObj) {
         JSONArray awemeList = videoJsonObj.getJSONArray("aweme_list");
 
-        if(awemeList == null){
-            return ;
+        if (awemeList == null) {
+            return;
         }
         for (int i = 0; i < awemeList.size(); i++) {
             DouyinVideo video = new DouyinVideo();
@@ -45,7 +49,7 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
 
                 DouyinVideo oldVideo = this.baseMapper.selectOne(new LambdaQueryWrapper<DouyinVideo>()
                         .eq(DouyinVideo::getAwemeId, awemeObj.getString("aweme_id")));
-                if(oldVideo != null){
+                if (oldVideo != null) {
                     continue;
                 }
 
@@ -64,6 +68,22 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
                     video.setShareCount(statistics.getInteger("share_count"));
                     video.setForwardCount(statistics.getInteger("forward_count"));
                 }
+
+
+                //获取话题信息
+                JSONArray chaList = awemeObj.getJSONArray("cha_list");
+                if (chaList != null || chaList.size() > 0) {
+                    for (int j = 0; j < chaList.size(); j++) {
+                        JSONObject chaObj = chaList.getJSONObject(j);
+                        DouyinChallenge douyinChallenge = new DouyinChallenge();
+                        douyinChallenge.setChaDesc(chaObj.getString("desc"));
+                        douyinChallenge.setChaName(chaObj.getString("cha_name"));
+                        douyinChallenge.setCid(chaObj.getString("cid"));
+                        douyinChallengeService.save(douyinChallenge);
+                    }
+
+                }
+
 
                 //视频位置信息
                 JSONObject poiInfo = awemeObj.getJSONObject("poi_info");
@@ -91,10 +111,10 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
                     video.setUid(author.getString("uid"));
 
 
-                    synchronized (this){
+                    synchronized (this) {
                         DouyinUser hasUser = douyinUserService.selectByUid(author.getString("uid"));
 
-                        if(hasUser == null){
+                        if (hasUser == null) {
                             user.setUid(author.getString("uid"));
                             user.setShortId(author.getString("short_id"));
                             user.setNickname(author.getString("nickname"));
@@ -106,11 +126,11 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
                             DouyinUserQueryDTO dto = new DouyinUserQueryDTO();
                             dto.setSecUid(user.getSecUid());
                             dto.setUid(user.getUid());
-                            douYinUserDataQuerySender.sender(DouyinUserQueryTopic,dto);
+                            douYinUserDataQuerySender.sender(DouyinUserQueryTopic, dto);
                         }
                     }
 
-                    video.setCrawlTime(System.currentTimeMillis()/1000L);//设置抓取时间 unix 时间搓
+                    video.setCrawlTime(System.currentTimeMillis() / 1000L);//设置抓取时间 unix 时间搓
                     this.save(video);
 
                 }
