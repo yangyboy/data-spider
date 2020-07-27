@@ -8,6 +8,7 @@ import com.data.entity.DouyinChallenge;
 import com.data.entity.DouyinUser;
 import com.data.entity.DouyinVideo;
 import com.data.kafka.dto.DouyinUserQueryDTO;
+import com.data.kafka.producer.DouYinChallengeDataQuerySender;
 import com.data.kafka.producer.DouYinUserDataQuerySender;
 import com.data.mapper.DouyinVideoMapper;
 import com.data.service.IDouyinUserService;
@@ -27,6 +28,10 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
 
     @Resource
     private DouYinUserDataQuerySender douYinUserDataQuerySender;
+
+    @Resource
+    private DouYinChallengeDataQuerySender douYinChallengeDataQuerySender;
+
 
     @Resource
     private IDouyinChallengeService douyinChallengeService;
@@ -72,14 +77,31 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
 
                 //获取话题信息
                 JSONArray chaList = awemeObj.getJSONArray("cha_list");
-                if (chaList != null || chaList.size() > 0) {
+                if (chaList != null) {
                     for (int j = 0; j < chaList.size(); j++) {
                         JSONObject chaObj = chaList.getJSONObject(j);
                         DouyinChallenge douyinChallenge = new DouyinChallenge();
+                        douyinChallenge.setCid(chaObj.getString("cid"));
+
+                        synchronized (this){
+                            DouyinChallenge old = douyinChallengeService.getOne(new LambdaQueryWrapper<DouyinChallenge>().eq(DouyinChallenge::getCid, douyinChallenge.getCid()));
+
+                            if(old != null){
+                                continue;
+                            }
+                        }
+
                         douyinChallenge.setChaDesc(chaObj.getString("desc"));
                         douyinChallenge.setChaName(chaObj.getString("cha_name"));
-                        douyinChallenge.setCid(chaObj.getString("cid"));
+                        douyinChallenge.setViewCount(chaObj.getInteger("view_count"));
+                        douyinChallenge.setUserCount(chaObj.getInteger("user_count"));
                         douyinChallengeService.save(douyinChallenge);
+
+                        //设置当前循环视频的话题id
+                        video.setChaId(douyinChallenge.getCid());
+
+
+//                        douYinChallengeDataQuerySender.sender();
                     }
 
                 }

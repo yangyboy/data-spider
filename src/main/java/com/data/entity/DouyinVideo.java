@@ -91,4 +91,9 @@ public class DouyinVideo {
      * 抓取时间
      */
     private long crawlTime;
+
+    /**
+     * 视频id
+     */
+    private String chaId;
 }
