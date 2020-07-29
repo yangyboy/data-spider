@@ -60,7 +60,6 @@ public class DouyinChallengeServiceImpl extends ServiceImpl<DouyinChallengeMappe
                 break;
             }
             videoSearchObj.put("source", CommonConst.VideoConstant.VIDEO_SOURCE_CHALLENGE);
-            videoSearchObj.put("cid", cid);
 
             douyinVideoService.handDouyinVideoData(videoSearchObj);
 

@@ -42,7 +42,6 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
     private IDouyinChallengeService douyinChallengeService;
 
 
-
     @Value("${mq.topicName.douyin.user.query}")
     private String DouyinUserQueryTopic;
     @Value("${douyin.video.query}")
@@ -79,7 +78,7 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
                 video.setShareUrl(awemeObj.getString("share_url"));
 
 
-                if(source.equals(CommonConst.VideoConstant.VIDEO_SOURCE_WORDKEY)){
+                if (source.equals(CommonConst.VideoConstant.VIDEO_SOURCE_WORDKEY)) {
                     //视频数据信息获取（点赞，转发，评论数等等）
                     JSONObject statistics = awemeObj.getJSONObject("statistics");
                     if (statistics != null) {
@@ -89,18 +88,18 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
                         video.setShareCount(statistics.getInteger("share_count"));
                         video.setForwardCount(statistics.getInteger("forward_count"));
                     }
-                }else{
+                } else {
                     String queryUrl = baseVideoQueryUrl + video.getAwemeId();
                     String message = JsoupUtl.getMessage(queryUrl);
 
-                    if(StrUtil.isEmpty(message) || !message.startsWith("{")){
-                        log.info("抖音用户：{} 查询失败，查询结果为：{}",video.getAwemeId(),message);
-                        continue ;
+                    if (StrUtil.isEmpty(message) || !message.startsWith("{")) {
+                        log.info("抖音用户：{} 查询失败，查询结果为：{}", video.getAwemeId(), message);
+                        continue;
                     }
                     JSONObject userObj = JSON.parseObject(message);
                     JSONArray item_list = userObj.getJSONArray("item_list");
 
-                    if(item_list == null || item_list.size() < 1){
+                    if (item_list == null || item_list.size() < 1) {
                         continue;
                     }
 
@@ -116,41 +115,35 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
                 }
 
 
-                if(source.equals(CommonConst.VideoConstant.VIDEO_SOURCE_WORDKEY)){
-                    //获取话题信息
-                    JSONArray chaList = awemeObj.getJSONArray("cha_list");
-                    if (chaList != null) {
-                        for (int j = 0; j < chaList.size(); j++) {
-                            JSONObject chaObj = chaList.getJSONObject(j);
-                            DouyinChallenge douyinChallenge = new DouyinChallenge();
-                            douyinChallenge.setCid(chaObj.getString("cid"));
+                //获取话题信息
+                JSONArray chaList = awemeObj.getJSONArray("cha_list");
+                if (chaList != null) {
+                    for (int j = 0; j < chaList.size(); j++) {
+                        JSONObject chaObj = chaList.getJSONObject(j);
+                        DouyinChallenge douyinChallenge = new DouyinChallenge();
+                        douyinChallenge.setCid(chaObj.getString("cid"));
 
-                            synchronized (this){
-                                DouyinChallenge old = douyinChallengeService.getOne(new LambdaQueryWrapper<DouyinChallenge>().eq(DouyinChallenge::getCid, douyinChallenge.getCid()));
+                        //设置当前循环视频的话题id
+                        video.setChaId(douyinChallenge.getCid());
 
-                                if(old != null){
-                                    continue;
-                                }
+                        synchronized (this) {
+                            DouyinChallenge old = douyinChallengeService.getOne(new LambdaQueryWrapper<DouyinChallenge>().eq(DouyinChallenge::getCid, douyinChallenge.getCid()));
+
+                            if (old != null) {
+                                continue;
                             }
+                        }
 
-                            douyinChallenge.setChaDesc(chaObj.getString("desc"));
-                            douyinChallenge.setChaName(chaObj.getString("cha_name"));
-                            douyinChallenge.setViewCount(chaObj.getInteger("view_count"));
-                            douyinChallenge.setUserCount(chaObj.getInteger("user_count"));
-                            douyinChallengeService.save(douyinChallenge);
+                        douyinChallenge.setChaDesc(chaObj.getString("desc"));
+                        douyinChallenge.setChaName(chaObj.getString("cha_name"));
+                        douyinChallenge.setViewCount(chaObj.getInteger("view_count"));
+                        douyinChallenge.setUserCount(chaObj.getInteger("user_count"));
+                        douyinChallengeService.save(douyinChallenge);
 
-                            //设置当前循环视频的话题id
-                            video.setChaId(douyinChallenge.getCid());
 
 
 //                        douYinChallengeDataQuerySender.sender();
-                        }
-
                     }
-
-                }else{
-
-                    video.setChaId(cid);
 
                 }
 
@@ -193,7 +186,7 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
                             user.setSecUid(author.getString("sec_uid"));
 
                             douyinUserService.save(user);
-                            if(source.equals(CommonConst.VideoConstant.VIDEO_SOURCE_WORDKEY)){
+                            if (source.equals(CommonConst.VideoConstant.VIDEO_SOURCE_WORDKEY)) {
                                 DouyinUserQueryDTO dto = new DouyinUserQueryDTO();
                                 dto.setSecUid(user.getSecUid());
                                 dto.setUid(user.getUid());
