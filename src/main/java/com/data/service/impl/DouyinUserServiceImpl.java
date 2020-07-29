@@ -34,6 +34,7 @@ public class DouyinUserServiceImpl extends ServiceImpl<DouyinUserMapper, DouyinU
 
         if(StrUtil.isEmpty(message) || !message.startsWith("{")){
             log.info("抖音用户：{} 查询失败，查询结果为：{}",dto.getUid(),message);
+            return ;
         }
 
         DouyinUser douyinUser = this.selectByUid(dto.getUid());
