@@ -42,17 +42,19 @@ public class DouyinUserServiceImpl extends ServiceImpl<DouyinUserMapper, DouyinU
 
         JSONObject userObj = JSON.parseObject(message);
         JSONObject userInfo = userObj.getJSONObject("user_info");
+        if(userInfo !=null){
+            douyinUser.setAwemeCount(userInfo.getInteger("aweme_count"));
+            douyinUser.setFollowerCount(userInfo.getInteger("follower_count"));
 
-        douyinUser.setAwemeCount(userInfo.getInteger("aweme_count"));
-        douyinUser.setFollowerCount(userInfo.getInteger("follower_count"));
+            douyinUser.setTotalFavorited(userInfo.getInteger("total_favorited"));
 
-        douyinUser.setTotalFavorited(userInfo.getInteger("total_favorited"));
-
-        douyinUser.setFollowingCount(userInfo.getInteger("following_count"));
-        douyinUser.setFavoritingCount(userInfo.getInteger("favoriting_count"));
+            douyinUser.setFollowingCount(userInfo.getInteger("following_count"));
+            douyinUser.setFavoritingCount(userInfo.getInteger("favoriting_count"));
 
 
-        this.updateById(douyinUser);
+            this.updateById(douyinUser);
+        }
+
 
     }
 }
