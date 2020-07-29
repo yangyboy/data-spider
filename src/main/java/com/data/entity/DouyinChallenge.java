@@ -19,5 +19,10 @@ public class DouyinChallenge {
     private Integer viewCount;
 
     private Integer userCount;
+
+    /**
+     * 爬取状态  默认未为0 未爬取
+     */
+    private Integer crawlStatus = 0;
     
 }

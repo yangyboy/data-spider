@@ -43,6 +43,9 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
     public void handDouyinVideoData(JSONObject videoJsonObj) {
         JSONArray awemeList = videoJsonObj.getJSONArray("aweme_list");
 
+
+        Integer source = videoJsonObj.getInteger("source");
+
         if (awemeList == null) {
             return;
         }
@@ -59,6 +62,7 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
                 }
 
                 // 视频基本信息获取
+                video.setSource(source);
                 video.setAwemeId(awemeObj.getString("aweme_id"));
                 video.setTitle(awemeObj.getString("desc"));
                 video.setCreateTime(awemeObj.getLong("create_time"));

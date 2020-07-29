@@ -93,7 +93,11 @@ public class DouyinVideo {
     private long crawlTime;
 
     /**
-     * 视频id
+     * 话题id
      */
     private String chaId;
+    /**
+     *  数据来源 0 关键字爬取  1 话题爬取
+     */
+    private Integer source;
 }

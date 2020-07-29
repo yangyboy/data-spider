@@ -1,12 +1,15 @@
 package com.data.tasks;
 
+import com.data.entity.DouyinChallenge;
 import com.data.entity.ProxyIp;
 import com.data.kafka.dto.ProxyIpDTO;
 import com.data.kafka.producer.CheckIpSender;
+import com.data.kafka.producer.DouYinChallengeVideoQuerySender;
 import com.data.service.ICrawlService;
 import com.data.service.IDouyinHotwordService;
 import com.data.service.IDouyinRespFileScanService;
 import com.data.service.IProxyIpService;
+import com.data.service.impl.IDouyinChallengeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,6 +32,8 @@ public class ScheduledTasks {
 
     @Value("${mq.topicName.checkIP}")
     private String checkIPTopicName;
+    @Value("${mq.topicName.douyin.challenge.video}")
+    private String challengeCrawlTopicName;
 
     @Resource
     private IProxyIpService proxyIpService;
@@ -38,6 +43,12 @@ public class ScheduledTasks {
     private ICrawlService crawlService;
     @Resource
     private IDouyinRespFileScanService douyinRespFileScanService;
+
+    @Resource
+    private DouYinChallengeVideoQuerySender douYinChallengeVideoQuerySender;
+
+    @Resource
+    private IDouyinChallengeService douyinChallengeService;
 
     @Resource
     private IDouyinHotwordService douyinHotwordService;
@@ -110,12 +121,32 @@ public class ScheduledTasks {
     /**
      * 扫描抖音热榜词，并入库
      */
-    @Scheduled(cron = "${task.hot.word.schedule}")
-    public void hotword(){
-        Date current = new Date();
-        log.info(MessageFormat.format("开始执行抖音热榜查询任务，时间：{0}",FORMAT.format(current)));
+//    @Scheduled(cron = "${task.hot.word.schedule}")
+//    public void hotword(){
+//        Date current = new Date();
+//        log.info(MessageFormat.format("开始执行抖音热榜查询任务，时间：{0}",FORMAT.format(current)));
+//
+//        douyinHotwordService.hotSearch();
+//    }
 
-        douyinHotwordService.hotSearch();
+    /**
+     * 话题视频爬取
+     */
+    @Scheduled(cron = "${task.challenge.video.schedule}")
+    public void queryChallengeVideo(){
+        Date current = new Date();
+        log.debug(MessageFormat.format("开始执行话题视频爬取任务，Date：{0}",FORMAT.format(current)));
+
+        //1 查询数据库中所有话题
+        List<DouyinChallenge> list = douyinChallengeService.list();
+
+        if(list != null && list.size() > 0){
+            //2 遍历
+            list.forEach(douyinChallenge -> {
+                //3 添加到队列中
+                douYinChallengeVideoQuerySender.sender(challengeCrawlTopicName, douyinChallenge.getCid());
+            });
+        }
     }
 
 }

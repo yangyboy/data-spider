@@ -3,6 +3,7 @@ package com.data.service.impl;
 import cn.hutool.core.io.file.FileReader;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.data.constant.CommonConst;
 import com.data.kafka.producer.DouYinVideoDataSender;
 import com.data.service.IDouyinRespFileScanService;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,7 @@ public class DouyinRespFileScanServiceImpl implements IDouyinRespFileScanService
                 FileReader fileReader = new FileReader(respFile.getAbsolutePath());
                 String result = fileReader.readString();
                 JSONObject videoJsonObj = JSON.parseObject(result);
+                videoJsonObj.put("source", CommonConst.VideoConstant.VIDEO_SOURCE_WORDKEY);
                 douYinVideoDataSender.sender(douyinVideoTopic,videoJsonObj);
 
                 respFile.delete();//扫描完成后 删除该文件
