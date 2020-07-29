@@ -1,9 +1,12 @@
 package com.data.service.impl;
 
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.data.constant.CommonConst;
 import com.data.entity.DouyinChallenge;
 import com.data.entity.DouyinUser;
 import com.data.entity.DouyinVideo;
@@ -11,8 +14,10 @@ import com.data.kafka.dto.DouyinUserQueryDTO;
 import com.data.kafka.producer.DouYinChallengeDataQuerySender;
 import com.data.kafka.producer.DouYinUserDataQuerySender;
 import com.data.mapper.DouyinVideoMapper;
+import com.data.service.IDouyinChallengeService;
 import com.data.service.IDouyinUserService;
 import com.data.service.IDouyinVideoService;
+import com.data.util.JsoupUtl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -36,8 +41,12 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
     @Resource
     private IDouyinChallengeService douyinChallengeService;
 
+
+
     @Value("${mq.topicName.douyin.user.query}")
     private String DouyinUserQueryTopic;
+    @Value("${douyin.video.query}")
+    private String baseVideoQueryUrl;
 
     @Override
     public void handDouyinVideoData(JSONObject videoJsonObj) {
@@ -68,14 +77,41 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
                 video.setCreateTime(awemeObj.getLong("create_time"));
                 video.setShareUrl(awemeObj.getString("share_url"));
 
-                //视频数据信息获取（点赞，转发，评论数等等）
-                JSONObject statistics = awemeObj.getJSONObject("statistics");
-                if (statistics != null) {
-                    video.setCommentCount(statistics.getInteger("comment_count"));
-                    video.setDiggCount(statistics.getInteger("digg_count"));
-                    video.setDownloadCount(statistics.getInteger("download_count"));
-                    video.setShareCount(statistics.getInteger("share_count"));
-                    video.setForwardCount(statistics.getInteger("forward_count"));
+
+                if(source.equals(CommonConst.VideoConstant.VIDEO_SOURCE_WORDKEY)){
+                    //视频数据信息获取（点赞，转发，评论数等等）
+                    JSONObject statistics = awemeObj.getJSONObject("statistics");
+                    if (statistics != null) {
+                        video.setCommentCount(statistics.getInteger("comment_count"));
+                        video.setDiggCount(statistics.getInteger("digg_count"));
+                        video.setDownloadCount(statistics.getInteger("download_count"));
+                        video.setShareCount(statistics.getInteger("share_count"));
+                        video.setForwardCount(statistics.getInteger("forward_count"));
+                    }
+                }else{
+                    String queryUrl = baseVideoQueryUrl + video.getAwemeId();
+                    String message = JsoupUtl.getMessage(queryUrl);
+
+                    if(StrUtil.isEmpty(message) || !message.startsWith("{")){
+                        log.info("抖音用户：{} 查询失败，查询结果为：{}",video.getAwemeId(),message);
+                        continue ;
+                    }
+                    JSONObject userObj = JSON.parseObject(message);
+                    JSONArray item_list = userObj.getJSONArray("item_list");
+
+                    if(item_list == null || item_list.size() < 1){
+                        continue;
+                    }
+
+                    JSONObject videoQueryObj = item_list.getJSONObject(0);
+                    JSONObject statistics = videoQueryObj.getJSONObject("statistics");
+                    if (statistics != null) {
+                        video.setCommentCount(statistics.getInteger("comment_count"));
+                        video.setDiggCount(statistics.getInteger("digg_count"));
+                        video.setDownloadCount(statistics.getInteger("download_count"));
+                        video.setShareCount(statistics.getInteger("share_count"));
+                        video.setForwardCount(statistics.getInteger("forward_count"));
+                    }
                 }
 
 
@@ -149,10 +185,12 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
                             user.setSecUid(author.getString("sec_uid"));
 
                             douyinUserService.save(user);
-                            DouyinUserQueryDTO dto = new DouyinUserQueryDTO();
-                            dto.setSecUid(user.getSecUid());
-                            dto.setUid(user.getUid());
-                            douYinUserDataQuerySender.sender(DouyinUserQueryTopic, dto);
+                            if(source.equals(CommonConst.VideoConstant.VIDEO_SOURCE_WORDKEY)){
+                                DouyinUserQueryDTO dto = new DouyinUserQueryDTO();
+                                dto.setSecUid(user.getSecUid());
+                                dto.setUid(user.getUid());
+                                douYinUserDataQuerySender.sender(DouyinUserQueryTopic, dto);
+                            }
                         }
                     }
 

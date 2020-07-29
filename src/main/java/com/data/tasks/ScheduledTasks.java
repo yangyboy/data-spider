@@ -11,7 +11,7 @@ import com.data.service.ICrawlService;
 import com.data.service.IDouyinHotwordService;
 import com.data.service.IDouyinRespFileScanService;
 import com.data.service.IProxyIpService;
-import com.data.service.impl.IDouyinChallengeService;
+import com.data.service.IDouyinChallengeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;

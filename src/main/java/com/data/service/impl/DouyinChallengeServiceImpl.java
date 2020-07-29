@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.data.constant.CommonConst;
 import com.data.entity.DouyinChallenge;
 import com.data.mapper.DouyinChallengeMapper;
+import com.data.service.IDouyinChallengeService;
 import com.data.service.IDouyinVideoService;
 import com.data.util.JsoupUtl;
 import lombok.extern.slf4j.Slf4j;

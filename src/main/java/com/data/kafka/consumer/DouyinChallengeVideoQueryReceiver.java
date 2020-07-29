@@ -1,9 +1,7 @@
 package com.data.kafka.consumer;
 
 import com.alibaba.fastjson.JSON;
-import com.data.kafka.dto.DouyinUserQueryDTO;
-import com.data.service.IDouyinUserService;
-import com.data.service.impl.IDouyinChallengeService;
+import com.data.service.IDouyinChallengeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
