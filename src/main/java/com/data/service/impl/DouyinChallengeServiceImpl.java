@@ -3,7 +3,6 @@ package com.data.service.impl;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.data.constant.CommonConst;
@@ -16,8 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 
 @Service
@@ -45,7 +42,12 @@ public class DouyinChallengeServiceImpl extends ServiceImpl<DouyinChallengeMappe
             String formatUrl = MessageFormat.format(challengeVideoUrl, cid, count, cursor);
             String message = JsoupUtl.getMessage(formatUrl);
             if (StrUtil.isEmpty(message) || !message.startsWith("{")) {
-                log.info("抖音热搜榜查询失败，查询结果为：{}", message);
+                log.info("抖音话题视频查询失败，查询结果为：{}", message);
+                try {
+                    Thread.sleep(60000L);
+                } catch (InterruptedException e) {
+                    log.info("爬取话题视频线程被中断",e);
+                }
                 continue;
             }
             JSONObject videoSearchObj = JSON.parseObject(message);
@@ -56,18 +58,11 @@ public class DouyinChallengeServiceImpl extends ServiceImpl<DouyinChallengeMappe
             if (!hasMore) {
                 break;
             }
-
-            /**
-             * 手动put 数据来源，处理数据时入库，方便以后查询数据
-             */
             videoSearchObj.put("source", CommonConst.VideoConstant.VIDEO_SOURCE_CHALLENGE);
             douyinVideoService.handDouyinVideoData(videoSearchObj);
 
             cursor += count;
 
-            /**
-             * 防止请求太快被封ip，每次请求间隔三秒
-             */
             try {
                 Thread.sleep(2000L);
             } catch (InterruptedException e) {

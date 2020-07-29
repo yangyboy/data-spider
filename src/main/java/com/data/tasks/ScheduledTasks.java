@@ -1,5 +1,7 @@
 package com.data.tasks;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.data.constant.CommonConst;
 import com.data.entity.DouyinChallenge;
 import com.data.entity.ProxyIp;
 import com.data.kafka.dto.ProxyIpDTO;
@@ -137,8 +139,9 @@ public class ScheduledTasks {
         Date current = new Date();
         log.debug(MessageFormat.format("开始执行话题视频爬取任务，Date：{0}",FORMAT.format(current)));
 
-        //1 查询数据库中所有话题
-        List<DouyinChallenge> list = douyinChallengeService.list();
+        //1 查询数据库中所有未爬取的话题
+        List<DouyinChallenge> list = douyinChallengeService.list(new LambdaQueryWrapper<DouyinChallenge>()
+                .eq(DouyinChallenge::getCrawlStatus, CommonConst.ChallengeConstant.CHALLENGE_NOT_CRAWL));
 
         if(list != null && list.size() > 0){
             //2 遍历
