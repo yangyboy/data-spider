@@ -54,6 +54,7 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
 
 
         Integer source = videoJsonObj.getInteger("source");
+        String cid = videoJsonObj.getString("cid");
 
         if (awemeList == null) {
             return;
@@ -115,34 +116,41 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
                 }
 
 
-                //获取话题信息
-                JSONArray chaList = awemeObj.getJSONArray("cha_list");
-                if (chaList != null) {
-                    for (int j = 0; j < chaList.size(); j++) {
-                        JSONObject chaObj = chaList.getJSONObject(j);
-                        DouyinChallenge douyinChallenge = new DouyinChallenge();
-                        douyinChallenge.setCid(chaObj.getString("cid"));
+                if(source.equals(CommonConst.VideoConstant.VIDEO_SOURCE_WORDKEY)){
+                    //获取话题信息
+                    JSONArray chaList = awemeObj.getJSONArray("cha_list");
+                    if (chaList != null) {
+                        for (int j = 0; j < chaList.size(); j++) {
+                            JSONObject chaObj = chaList.getJSONObject(j);
+                            DouyinChallenge douyinChallenge = new DouyinChallenge();
+                            douyinChallenge.setCid(chaObj.getString("cid"));
 
-                        synchronized (this){
-                            DouyinChallenge old = douyinChallengeService.getOne(new LambdaQueryWrapper<DouyinChallenge>().eq(DouyinChallenge::getCid, douyinChallenge.getCid()));
+                            synchronized (this){
+                                DouyinChallenge old = douyinChallengeService.getOne(new LambdaQueryWrapper<DouyinChallenge>().eq(DouyinChallenge::getCid, douyinChallenge.getCid()));
 
-                            if(old != null){
-                                continue;
+                                if(old != null){
+                                    continue;
+                                }
                             }
-                        }
 
-                        douyinChallenge.setChaDesc(chaObj.getString("desc"));
-                        douyinChallenge.setChaName(chaObj.getString("cha_name"));
-                        douyinChallenge.setViewCount(chaObj.getInteger("view_count"));
-                        douyinChallenge.setUserCount(chaObj.getInteger("user_count"));
-                        douyinChallengeService.save(douyinChallenge);
+                            douyinChallenge.setChaDesc(chaObj.getString("desc"));
+                            douyinChallenge.setChaName(chaObj.getString("cha_name"));
+                            douyinChallenge.setViewCount(chaObj.getInteger("view_count"));
+                            douyinChallenge.setUserCount(chaObj.getInteger("user_count"));
+                            douyinChallengeService.save(douyinChallenge);
 
-                        //设置当前循环视频的话题id
-                        video.setChaId(douyinChallenge.getCid());
+                            //设置当前循环视频的话题id
+                            video.setChaId(douyinChallenge.getCid());
 
 
 //                        douYinChallengeDataQuerySender.sender();
+                        }
+
                     }
+
+                }else{
+
+                    video.setChaId(cid);
 
                 }
 
