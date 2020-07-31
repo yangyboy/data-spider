@@ -16,9 +16,9 @@ public class DouyinChallenge {
 
     private String chaDesc;
 
-    private Integer viewCount;
+    private Long viewCount;
 
-    private Integer userCount;
+    private Long userCount;
 
     /**
      * 爬取状态  默认未为0 未爬取

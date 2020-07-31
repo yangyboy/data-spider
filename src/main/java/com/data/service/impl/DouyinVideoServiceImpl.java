@@ -116,37 +116,40 @@ public class DouyinVideoServiceImpl extends ServiceImpl<DouyinVideoMapper, Douyi
 
 
                 //获取话题信息
-                JSONArray chaList = awemeObj.getJSONArray("cha_list");
-                if (chaList != null) {
-                    for (int j = 0; j < chaList.size(); j++) {
-                        JSONObject chaObj = chaList.getJSONObject(j);
-                        DouyinChallenge douyinChallenge = new DouyinChallenge();
-                        douyinChallenge.setCid(chaObj.getString("cid"));
+                if(source.equals(CommonConst.VideoConstant.VIDEO_SOURCE_CHALLENGE)){
+                    video.setChaId(cid);
+                }else{
+                    JSONArray chaList = awemeObj.getJSONArray("cha_list");
+                    if (chaList != null) {
+                        for (int j = 0; j < chaList.size(); j++) {
+                            JSONObject chaObj = chaList.getJSONObject(j);
+                            DouyinChallenge douyinChallenge = new DouyinChallenge();
+                            douyinChallenge.setCid(chaObj.getString("cid"));
 
-                        //设置当前循环视频的话题id
-                        video.setChaId(douyinChallenge.getCid());
+                            //设置当前循环视频的话题id
+                            video.setChaId(douyinChallenge.getCid());
 
-                        synchronized (this) {
-                            DouyinChallenge old = douyinChallengeService.getOne(new LambdaQueryWrapper<DouyinChallenge>().eq(DouyinChallenge::getCid, douyinChallenge.getCid()));
+                            synchronized (this) {
+                                DouyinChallenge old = douyinChallengeService.getOne(new LambdaQueryWrapper<DouyinChallenge>().eq(DouyinChallenge::getCid, douyinChallenge.getCid()));
 
-                            if (old != null) {
-                                continue;
+                                if (old != null) {
+                                    continue;
+                                }
                             }
-                        }
 
-                        douyinChallenge.setChaDesc(chaObj.getString("desc"));
-                        douyinChallenge.setChaName(chaObj.getString("cha_name"));
-                        douyinChallenge.setViewCount(chaObj.getInteger("view_count"));
-                        douyinChallenge.setUserCount(chaObj.getInteger("user_count"));
-                        douyinChallengeService.save(douyinChallenge);
+                            douyinChallenge.setChaDesc(chaObj.getString("desc"));
+                            douyinChallenge.setChaName(chaObj.getString("cha_name"));
+                            douyinChallenge.setViewCount(chaObj.getLong("view_count"));
+                            douyinChallenge.setUserCount(chaObj.getLong("user_count"));
+                            douyinChallengeService.save(douyinChallenge);
 
 
 
 //                        douYinChallengeDataQuerySender.sender();
+                        }
+
                     }
-
                 }
-
 
                 //视频位置信息
                 JSONObject poiInfo = awemeObj.getJSONObject("poi_info");
